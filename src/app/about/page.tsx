@@ -44,6 +44,17 @@ export default function About() {
 
   const experiences = [
     {
+      id: "zs-associates",
+      company: "ZS Associates",
+      role: "Business Technology Solutions Associate Intern",
+      period: "Dec 2025",
+      logo: "/zs.png",
+      description:
+        "Upcoming BTSA intern starting December 2025.",
+      achievements: [],
+      link: "https://www.zs.com/"
+    },
+    {
       id: "procurpal",
       company: "ProcUrPal",
       role: "Full Stack Developer Intern",
@@ -179,17 +190,19 @@ export default function About() {
                         >
                         {exp.company}
                         </h3>
-                      <button 
-                        onClick={() => toggleExpand(exp.id)} 
-                        className="ml-2 p-2 rounded-full hover:bg-stone-800/50 transition-colors shrink-0 sm:hidden"
-                        aria-label={expandedExperiences[exp.id] ? "Collapse details" : "Expand details"}
-                      >
-                        {expandedExperiences[exp.id] ? (
-                          <ChevronUp className="w-5 h-5" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5" />
-                        )}
-                      </button>
+                      {exp.achievements && exp.achievements.length > 0 && (
+                        <button 
+                          onClick={() => toggleExpand(exp.id)} 
+                          className="ml-2 p-2 rounded-full hover:bg-stone-800/50 transition-colors shrink-0 sm:hidden"
+                          aria-label={expandedExperiences[exp.id] ? "Collapse details" : "Expand details"}
+                        >
+                          {expandedExperiences[exp.id] ? (
+                            <ChevronUp className="w-5 h-5" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5" />
+                          )}
+                        </button>
+                      )}
                     </div>
                     <div className="flex flex-col sm:flex-row sm:gap-4 mt-2">
                       <span className="text-sm text-zinc-300 inline-flex items-center">
@@ -207,24 +220,26 @@ export default function About() {
                     </div>
                   </div>
                 </div>
-                <button 
-                  onClick={() => toggleExpand(exp.id)} 
-                  className="hidden sm:block p-2 rounded-full transition-colors shrink-0"
-                  aria-label={expandedExperiences[exp.id] ? "Collapse details" : "Expand details"}
-                >
-                  {expandedExperiences[exp.id] ? (
-                    <ChevronUp className="w-5 h-5" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5" />
-                  )}
-                </button>
+                {exp.achievements && exp.achievements.length > 0 && (
+                  <button 
+                    onClick={() => toggleExpand(exp.id)} 
+                    className="hidden sm:block p-2 rounded-full transition-colors shrink-0"
+                    aria-label={expandedExperiences[exp.id] ? "Collapse details" : "Expand details"}
+                  >
+                    {expandedExperiences[exp.id] ? (
+                      <ChevronUp className="w-5 h-5" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5" />
+                    )}
+                  </button>
+                )}
               </div>
               <p className="text-sm text-zinc-200 mt-2 leading-relaxed">
                 {exp.description}
               </p>
               
               {/* Collapsible Content */}
-              {expandedExperiences[exp.id] && (
+              {expandedExperiences[exp.id] && exp.achievements && exp.achievements.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-stone-800/60 animate-slideDown">
                   <h4 className="font-medium text-sm mb-2 text-zinc-300">Key Achievements</h4>
                   <ul className="list-disc list-inside space-y-1 text-sm text-zinc-300">
