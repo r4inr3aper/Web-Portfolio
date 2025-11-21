@@ -47,10 +47,10 @@ export default function About() {
       id: "zs-associates",
       company: "ZS Associates",
       role: "Business Technology Solutions Associate Intern",
-      period: "Dec 2025",
+      period: "Jan 2026",
       logo: "/zs.png",
       description:
-        "Upcoming BTSA intern starting December 2025.",
+        "Upcoming BTSA intern starting January 2026.",
       achievements: [],
       link: "https://www.zs.com/"
     },
