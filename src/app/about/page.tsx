@@ -55,6 +55,16 @@ export default function About() {
       link: "https://www.zs.com/"
     },
     {
+      id: "stealth-startup",
+      company: "Stealth Startup",
+      role: "Full Stack Developer Intern",
+      period: "Nov 2025 - Present",
+      logo: "/stealth.jpeg",
+      description:
+        "Built and maintained full-stack systems at a stealth fintech startup using Next.js, TypeScript, Node.js, with database and API integrations.",
+      achievements: [],
+    },
+    {
       id: "procurpal",
       company: "ProcUrPal",
       role: "Full Stack Developer Intern",
