@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { FileText } from "lucide-react";
+import { FileText, Home, User, FolderKanban, BookOpen, Mail } from "lucide-react";
 
 export function Header() {
   const pathname = usePathname();
@@ -12,10 +12,11 @@ export function Header() {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const navItems = [
-    { label: "Home", path: "/" },
-    { label: "About", path: "/about" },
-    { label: "Projects", path: "/projects" },
-    { label: "Contact", path: "/contact" },
+    { label: "Home", path: "/", icon: Home },
+    { label: "About", path: "/about", icon: User },
+    { label: "Projects", path: "/projects", icon: FolderKanban },
+    { label: "Learnings", path: "/learnings", icon: BookOpen },
+    { label: "Contact", path: "/contact", icon: Mail },
   ];
 
   useEffect(() => {
@@ -130,22 +131,26 @@ export function Header() {
           />
 
           {/* Navigation items */}
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              href={item.path}
-              className={`px-4 py-3 border-1 border-gray-100 rounded-md text-sm relative no-underline transition-colors duration-200 ease-in z-10 
-                ${pathname === item.path
-                  ? "text-zinc-100"
-                  : hoveredItem === item.path
-                    ? "text-zinc-200"
-                    : "text-zinc-400"}`}
-              data-active={pathname === item.path}
-              onMouseEnter={() => handleMouseEnter(item.path)}
-            >
-              <span>{item.label}</span>
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.path}
+                href={item.path}
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2.5 sm:px-4 sm:py-3 border-1 border-gray-100 rounded-md text-sm relative no-underline transition-colors duration-200 ease-in z-10 
+                  ${pathname === item.path
+                    ? "text-zinc-100"
+                    : hoveredItem === item.path
+                      ? "text-zinc-200"
+                      : "text-zinc-400"}`}
+                data-active={pathname === item.path}
+                onMouseEnter={() => handleMouseEnter(item.path)}
+              >
+                <Icon size={16} className="flex-shrink-0 sm:hidden" />
+                <span className="hidden sm:inline">{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
       </div>
     </>
