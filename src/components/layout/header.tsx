@@ -105,19 +105,19 @@ export function Header() {
             href="https://drive.google.com/file/d/1WEvmzzwh0T1QV9oVlUgDoD1LaXwMeHH_/view?usp=drive_link"
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center gap-2 px-3 py-2 bg-stone-800/80 hover:bg-stone-800/90 border border-stone-700/50 hover:border-stone-700/70 rounded-lg text-sm font-normal text-zinc-100 transition-all duration-300 hover:shadow-md no-underline"
+            className="group flex items-center gap-2 px-4 py-2.5 sm:px-3 sm:py-2 bg-stone-800/80 hover:bg-stone-800/90 border border-stone-700/50 hover:border-stone-700/70 rounded-lg text-base sm:text-sm font-normal text-zinc-100 transition-all duration-300 hover:shadow-md no-underline"
           >
-            <FileText size={16} className="transition-transform duration-300 group-hover:rotate-3" />
+            <FileText size={18} className="sm:w-4 sm:h-4 transition-transform duration-300 group-hover:rotate-3" />
             <span className="hidden sm:inline">Resume</span>
           </a>
         </div>
       </section>
 
       {/* Navigation */}
-      <div className="border border-stone-800/90 p-[0.4rem] rounded-lg mb-12 sticky top-4 z-[100] bg-stone-900/80 backdrop-blur-md">
+      <div className="border border-stone-800/90 p-2 sm:p-[0.4rem] rounded-lg mb-12 sticky top-4 z-[100] bg-stone-900/80 backdrop-blur-md">
         <nav
           ref={navRef}
-          className="flex gap-2 relative justify-start w-full z-[100] rounded-lg"
+          className="flex gap-2 sm:gap-2 relative justify-start w-full z-[100] rounded-lg"
           onMouseLeave={handleMouseLeave}
         >
           {/* Active indicator background */}
@@ -137,7 +137,7 @@ export function Header() {
               <Link
                 key={item.path}
                 href={item.path}
-                className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2.5 sm:px-4 sm:py-3 border-1 border-gray-100 rounded-md text-sm relative no-underline transition-colors duration-200 ease-in z-10 
+                className={`flex items-center justify-center gap-2 sm:gap-2 px-4 py-3 sm:px-4 sm:py-3 border-1 border-gray-100 rounded-md text-base sm:text-sm relative no-underline transition-colors duration-200 ease-in z-10 min-h-[44px] sm:min-h-0
                   ${pathname === item.path
                     ? "text-zinc-100"
                     : hoveredItem === item.path
@@ -146,7 +146,7 @@ export function Header() {
                 data-active={pathname === item.path}
                 onMouseEnter={() => handleMouseEnter(item.path)}
               >
-                <Icon size={16} className="flex-shrink-0 sm:hidden" />
+                <Icon size={20} className="flex-shrink-0 sm:hidden" />
                 <span className="hidden sm:inline">{item.label}</span>
               </Link>
             );
