@@ -102,7 +102,7 @@ export function Header() {
         {/* Resume Button */}
         <div className="flex items-center">
           <a
-            href="https://drive.google.com/file/d/15bivsiGDuSctgDFQa2wb06W-ExTvtBTQ/view?usp=sharing"
+            href="https://drive.google.com/file/d/1WEvmzzwh0T1QV9oVlUgDoD1LaXwMeHH_/view?usp=drive_link"
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-2 px-3 py-2 bg-stone-800/80 hover:bg-stone-800/90 border border-stone-700/50 hover:border-stone-700/70 rounded-lg text-sm font-normal text-zinc-100 transition-all duration-300 hover:shadow-md no-underline"
