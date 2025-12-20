@@ -85,7 +85,7 @@ export function Header() {
       <section className="w-full flex gap-4 justify-between mb-6 p-2">
         <div className="flex gap-4">
           <img
-            src="./me.jpeg"
+            src="/me.jpeg"
             alt="bedanta"
             width={60}
             height={60}
@@ -133,17 +133,20 @@ export function Header() {
           {/* Navigation items */}
           {navItems.map((item) => {
             const Icon = item.icon;
+            const isActive = item.path === "/learnings" 
+              ? pathname === item.path || pathname.startsWith("/learnings/")
+              : pathname === item.path;
             return (
               <Link
                 key={item.path}
                 href={item.path}
                 className={`flex items-center justify-center gap-2 sm:gap-2 px-4 py-3 sm:px-4 sm:py-3 border-1 border-gray-100 rounded-md text-base sm:text-sm relative no-underline transition-colors duration-200 ease-in z-10 min-h-[44px] sm:min-h-0
-                  ${pathname === item.path
+                  ${isActive
                     ? "text-zinc-100"
                     : hoveredItem === item.path
                       ? "text-zinc-200"
                       : "text-zinc-400"}`}
-                data-active={pathname === item.path}
+                data-active={isActive}
                 onMouseEnter={() => handleMouseEnter(item.path)}
               >
                 <Icon size={20} className="flex-shrink-0 sm:hidden" />

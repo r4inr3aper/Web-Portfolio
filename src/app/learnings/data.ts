@@ -13,27 +13,40 @@ export const learningPosts: LearningPost[] = [
   {
     id: 1,
     title: "Making Search Feel Smart (Without AI)",
-    excerpt: "Search doesn't break because data is wrong — it breaks because humans aren't precise. Fuzzy search forgives typos, half-remembered words, and imperfect queries. Here's how it actually works.",
+    excerpt: "Search doesn't break because data is wrong — it breaks because humans aren't precise. Fuzzy search forgives typos, half-remembered words and imperfect queries. Here's how it actually works.",
     content: `# Making Search Feel Smart (Without AI)
 
 > NOTE: If you just want the code, check out [Fuse.js docs](https://fusejs.io/) or skip to the ==Fuse.js: Practical Fuzzy Search== section. The algorithm deep-dive is optional but worth it if you're curious about how things actually work under the hood.
 
-I learned this while working at a fintech startup: search doesn't break because data is wrong — it breaks because ==humans aren't precise==. This problem is everywhere, from e-commerce search to code autocomplete.
+I learned this while working at a fintech startup: search breaks when it demands perfection. Users search "mutual fand" instead of "mutual fund" and get zero results. They type "mutual fnd" (missing a letter) or "mutual fundd" (extra letter) — and exact matching gives empty output.
 
-Users misspell fund names.
-They remember half the word.
-They type vibes, not syntax.
-
-Exact search fails.
-==Fuzzy search forgives==.
+Fuzzy search fixes this by measuring similarity instead of exact matches. It forgives typos, handles partial words and ranks results by how close they are. Here's how it actually works.
 
 ## What Is Fuzzy Search?
 
-Fuzzy search is essentially ==string matching with tolerance==. It searches for text that matches approximately, not exactly.
+**The core idea:** Instead of asking "Do these strings match exactly?", fuzzy search asks ==**"How similar are these strings?"**== 
 
-The only question that matters is: **How close are two strings?**
+Once you can measure similarity, you can:
+- Rank results by how close they are (best matches first)
+- Forgive typos and misspellings
+- Handle partial matches ("fund" matches "funds")
 
-Once you can measure closeness, search stops being a filter and becomes ==a ranking problem==. This is where it gets interesting.
+**What the output looks like:**
+
+When you search "mutual fand" (typo), fuzzy search returns ranked results:
+
+\`\`\`
+Query: "mutual fand"
+
+Results (ranked by similarity):
+1. "Mutual Fund" (distance: 1, closest match)
+2. "Mutual Funds" (distance: 2)
+3. "Mutual Fund Index" (distance: 3)
+\`\`\`
+
+Instead of zero results, you get matches ordered by how close they are to your query. ==The best match appears first==, even with typos.
+
+==It's search with empathy== — understanding that humans make mistakes.
 
 ## How Do We Measure "Closeness"?
 
@@ -41,61 +54,72 @@ There's no single best algorithm. It depends on the use case. Here are the ones 
 
 ### 1. Hamming Distance
 
-Counts how many characters need to be replaced. ==Simple, but limited==.
+Counts how many characters need to be replaced so that the strings match. ==Simple, but limited==.
 
 \`\`\`
-fund → fand  (distance = 1)
+fund → fand  (distance = 1, replace 'u' with 'a')
+hello → heppo  (distance = 2, replace first 'l' with 'p' and second 'l' with 'p')
 \`\`\`
 
-**Limitation:** works only when both strings are the same length.
+**Key insight:** ==Lower distance = closer match==. When searching, results with the smallest Hamming distance are ranked highest because they require fewer changes to match.
+
+**Limitation:** works only when both strings are the same length. If lengths differ, Hamming distance doesn't apply.
 
 **Good for:**
-- fixed-length IDs
-- codes (ISBNs, barcodes)
+- fixed-length IDs (e.g. phone numbers)
+- codes (ISBNs, barcodes, error-correcting codes)
 
 ### 2. Levenshtein Distance (The Default Choice)
 
-Allows three operations: replace, insert, and delete. ==This is the one you'll actually use==.
+Allows three operations: replace, insert and delete unlike just replace in Hamming distance. ==This is the one you'll actually use==.
 
 \`\`\`
-fund → fnd   (delete)
-fund → fundd (insert)
-fund → fand  (replace)
+fund → fnd   (distance = 1, delete 'u')
+fund → fundd (distance = 1, insert 'd')
+fund → fand  (distance = 1, replace 'u' with 'a')
+man → human  (distance = 2, insert 'h' and 'u')
+kitten → sitting (distance = 3, replace 'k'→'s', 'e'→'i', insert 'g')
 \`\`\`
 
 This is what most fuzzy search systems use under the hood. [Wikipedia has a solid explanation](https://en.wikipedia.org/wiki/Levenshtein_distance) if you want the formal definition.
 
 ## How Levenshtein Actually Works
 
-You could brute-force all possibilities using recursion. ==That explodes fast== — O(3^max(n,m)) bad news.
+You could brute-force all possibilities using recursion and compare all possibilities. That explodes fast — O(3^max(n,m)) bad news.
 
-Instead, we use **Dynamic Programming** (aka the ==Wagner–Fischer algorithm==). This is similar to classic DP problems like [Longest Common Subsequence](https://leetcode.com/problems/longest-common-subsequence/) — same table-building approach, but for edit distance.
+Instead, we use **Dynamic Programming** (aka the ==Wagner–Fischer algorithm==). This is similar to classic DP problems like [Longest Common Subsequence](https://leetcode.com/problems/longest-common-subsequence/description/) — same table-building approach, but for edit distance.
 
 > NOTE: If DP tables make you dizzy, just remember: we're building a 2D cache where each cell stores the minimum edits to match strings up to that point. The bottom-right cell is our answer.
 
+Here's what the DP table looks like when comparing "man" vs "human". The ==green highlights== show the matches (m→m, a→a, n→n) and the bottom-right value of \`2\` is our final answer — it takes 2 edits to transform "man" into "human" (insert "h" and "u" at the start).
+
+![Levenshtein distance DP table showing comparison of man vs human with green highlights indicating matches](/learnings/fuzzy-dp-table.png)
+
+==Reading the table:== Each cell tells you the minimum edits needed to match substrings up to that point. Start from top-left (0), fill row-by-row and the bottom-right cell gives you the answer. The green cells show where characters match — when that happens, you take the diagonal value (no edit needed).
+
 **The Algorithm:**
 
-\`\`\`javascript
-function levenshteinDistance(str1, str2) {
-  const m = str1.length;
-  const n = str2.length;
-  const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+\`\`\`cpp
+int levenshteinDistance(const string& str1, const string& str2) {
+  int m = str1.length();
+  int n = str2.length();
+  vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
 
   // Base cases
-  for (let i = 0; i <= m; i++) dp[i][0] = i;
-  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (int i = 0; i <= m; i++) dp[i][0] = i;
+  for (int j = 0; j <= n; j++) dp[0][j] = j;
 
   // Fill the DP table
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      if (str1[i - 1] === str2[j - 1]) {
+  for (int i = 1; i <= m; i++) {
+    for (int j = 1; j <= n; j++) {
+      if (str1[i - 1] == str2[j - 1]) {
         dp[i][j] = dp[i - 1][j - 1]; // match
       } else {
-        dp[i][j] = Math.min(
+        dp[i][j] = min({
           dp[i - 1][j] + 1,     // delete
           dp[i][j - 1] + 1,     // insert
           dp[i - 1][j - 1] + 1  // replace
-        );
+        });
       }
     }
   }
@@ -126,7 +150,7 @@ They all solve the same problem — ==string similarity== — using different he
 
 ## Fuse.js: Practical Fuzzy Search
 
-In frontend-heavy apps, you usually don't reinvent this. ==Just use [Fuse.js](https://fusejs.io/)==. It's battle-tested, fast, and handles all the edge cases.
+In frontend-heavy apps, you usually don't reinvent this. ==Just use [Fuse.js](https://fusejs.io/)==. It's battle-tested, fast and handles all the edge cases.
 
 **Basic Setup:**
 
@@ -186,16 +210,16 @@ Conceptually:
 - Modern systems turn strings into ==vectors== (embeddings)
 - Similarity becomes ==distance in high-dimensional space==
 
+![2D and 3D approach to processing - from DP tables to vector embeddings](/learnings/2D+3Dapproach.png)
+
 That's how fuzzy search quietly evolves into:
 - ==vector search== (e.g., [Pinecone](https://www.pinecone.io/), [Qdrant](https://qdrant.tech/))
 - embeddings (e.g., [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings))
 - ==semantic search== (understands meaning, not just characters)
 
-Same idea. ==Bigger math==. If you're dealing with semantic similarity (not just typos), check out [this comparison](https://www.pinecone.io/learn/vector-search/).
+> NOTE: Don't jump to vector search unless you actually need it. For most apps, ==Levenshtein/Fuse.js is enough==. Vector search adds latency, cost (embedding API calls) and complexity. Ship fuzzy first, upgrade if users need semantic understanding. ==Vector search is commonly used in RAG (Retrieval-Augmented Generation) systems== where you need to find semantically similar documents/context, not just typo-tolerant string matching.
 
-> NOTE: Don't jump to vector search unless you actually need it. For most apps, ==Levenshtein/Fuse.js is enough==. Vector search adds latency, cost (embedding API calls), and complexity. Ship fuzzy first, upgrade if users need semantic understanding.
-
-## A Startup Footnote
+## The MVP Footnote
 
 If your dataset is huge: ==**Don't do fuzzy search on the frontend.**== You'll block the UI and regret it.
 
@@ -209,27 +233,11 @@ If your dataset is huge: ==**Don't do fuzzy search on the frontend.**== You'll b
 - ==index aggressively== (precompute distances if possible)
 - consider ==debouncing/throttling== if users type fast
 
-> NOTE: I've seen teams try to fuzzy search 10k+ items client-side. Don't. Even with web workers, it's janky. [Algolia](https://www.algolia.com/) and [Typesense](https://typesense.org/) are solid hosted options. [Meilisearch](https://www.meilisearch.com/) is self-hosted and open-source. All support fuzzy search out of the box.
-
-## The Real Takeaway
-
-Fuzzy search isn't AI. ==It's empathy==.
-
-You're telling your system: *"Users won't be perfect — and that's fine."*
-
-That single decision ==improves UX more than most features==. Shipping fuzzy search in week 2 instead of week 10 can make the difference between users loving your product and abandoning it.
-
-## Closing
-
-Most products don't need more intelligence. ==They need more tolerance==.
-
-Fuzzy search is one of the ==highest-ROI features== you can ship early — especially in fintech, where nobody remembers exact fund names, or e-commerce where people search for "blue jacket" instead of "navy denim outerwear".
-
-Ship forgiveness. Rank results. ==Let humans be human==.
-
 ## Conclusion
 
-Overall, I really like how fuzzy search makes products feel ==more human and forgiving==. I'm planning to explore more search and ranking algorithms in future posts — ==term frequency, BM25, and hybrid search== are next on my list.
+Fuzzy search isn't about complex algorithms — it's about ==measuring similarity instead of demanding perfection==. Under the hood, it's Levenshtein distance and a DP table. In practice, it's [Fuse.js](https://fusejs.io/) with a few lines of code.
+
+==Ship fuzzy search early== — it's one of the highest-ROI features you can add. Most products don't need vector search or semantic understanding. They just need to forgive typos and rank results. Let humans be human.
 
 If you want to dive deeper:
 - [LeetCode Edit Distance](https://leetcode.com/problems/edit-distance/) — implement Levenshtein yourself
@@ -237,10 +245,10 @@ If you want to dive deeper:
 - [Elasticsearch fuzzy queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html) — backend implementation
 - [Soundex algorithm](https://en.wikipedia.org/wiki/Soundex) — phonetic matching
 
-> NOTE: Want to chat about search? Hit me up on [X](https://x.com/bedantaxdev) or [GitHub](https://github.com/r4inr3aper). Always down to nerd out about algorithms and product decisions.
+> NOTE: Questions or thoughts? Hit me up on [X](https://x.com/bedantaxdev) or [GitHub](https://github.com/r4inr3aper). Always down to nerd out about algorithms and product decisions.
 
 Thanks for reading, see you in the next blog <3`,
-    date: "2025-01-20",
+    date: "2025-12-20",
     readTime: "6 min read",
     category: "Web Development",
     slug: "making-search-feel-smart-without-ai",
@@ -256,3 +264,4 @@ export function getAllLearningSlugs(): string[] {
 }
 
 
+  

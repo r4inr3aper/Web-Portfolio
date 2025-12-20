@@ -20,7 +20,7 @@ export default function Learnings() {
           <Link
             key={post.id}
             href={`/learnings/${post.slug}`}
-            className="group block border-stone-800 rounded-lg p-4 hover:bg-zinc-800/70 transition-colors"
+            className="group border border-stone-800 rounded-lg p-4 hover:bg-zinc-900/40 transition-colors"
           >
             <h3 className="text-base sm:text-lg font-semibold text-zinc-100 mb-1">
               {post.title}

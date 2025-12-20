@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getLearningPostBySlug } from "../data";
 import { use } from "react";
 import { CodeBlock } from "@/components/ui/code-block";
+import Image from "next/image";
 
 interface LearningPostPageProps {
   params: Promise<{ slug: string }>;
@@ -69,7 +70,8 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
       }
 
       // Check for highlight/mark (==text==)
-      const highlightMatch = text.substring(currentIndex).match(/^==([^=]+)==/);
+      // Use non-greedy match to find the first closing ==
+      const highlightMatch = text.substring(currentIndex).match(/^==(.+?)==/);
       if (highlightMatch) {
         parts.push(
           <mark key={`highlight-${currentIndex}`} className="text-[hsla(32,98%,83%,.9)] font-thin rounded bg-transparent">
@@ -462,6 +464,50 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
 
       // Skip processing if we're still in blockquote or note
       if (inBlockquote || inNote) {
+        return;
+      }
+
+      // Image detection (![alt](path))
+      const imageMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)/);
+      if (imageMatch) {
+        if (currentParagraph.length > 0) {
+          elements.push(
+            <p key={`p-${index}`} className="mb-4 text-sm sm:text-base">
+              {renderInlineMarkdown(currentParagraph.join(" "))}
+            </p>
+          );
+          currentParagraph = [];
+        }
+        if (inList) {
+          elements.push(
+            <ul key={`ul-${index}`} className="list-disc list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
+              {listItems.map((item, i) => (
+                <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
+              ))}
+            </ul>
+          );
+          listItems = [];
+          inList = false;
+        }
+        const altText = imageMatch[1];
+        const imagePath = imageMatch[2];
+        elements.push(
+          <div key={`image-${index}`} className="my-6 flex justify-center">
+            <div className="relative w-full max-w-2xl">
+              <Image
+                src={imagePath}
+                alt={altText || "Image"}
+                width={800}
+                height={600}
+                className="rounded-lg border border-stone-800/90 shadow-lg"
+                unoptimized
+              />
+              {altText && (
+                <p className="text-xs text-zinc-400 mt-2 text-center italic">{altText}</p>
+              )}
+            </div>
+          </div>
+        );
         return;
       }
 
