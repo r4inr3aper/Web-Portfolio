@@ -20,6 +20,7 @@ const config = {
     extend: {
       fontFamily: {
         sans: ["GeneralSans", "sans-serif"],
+        serif: ["Georgia", "Cambria", "Times New Roman", "Times", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",

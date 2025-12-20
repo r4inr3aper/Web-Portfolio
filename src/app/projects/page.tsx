@@ -27,6 +27,7 @@ export default function Projects() {
       link: "https://incand.in",
       github: "https://github.com/gdsc-nits-org/incand-api-2025",
       featured: true,
+      category: ["fullstack", "frontend-design"],
     },
     {
       id: 2,
@@ -47,6 +48,7 @@ export default function Projects() {
       link: "https://flick-puce.vercel.app/",
       github: "https://github.com/r4inr3aper/Flick",
       featured: true,
+      category: ["fullstack"],
     },
     {
       "id": 3,
@@ -67,7 +69,8 @@ export default function Projects() {
       ],
       "link": "https://www.inframeschool.com/",
       "github": "", 
-      "featured": false
+      "featured": false,
+      "category": ["fullstack"]
     },
     {
       id: 4,
@@ -91,6 +94,7 @@ export default function Projects() {
       link: "https://tecnoesis-2024.pages.dev/",
       github: "https://github.com/gdsc-nits-org/tecnoesis-2024",
       featured: false,
+      category: ["fullstack", "frontend-design"],
     },
     {
       id: 5,
@@ -112,6 +116,7 @@ export default function Projects() {
       link: "https://interview-ly.vercel.app/",
       github: "https://github.com/r4inr3aper/Interview.ly",
       featured: false,
+      category: ["ai-ml"],
     },
     {
       id: 6,
@@ -133,6 +138,7 @@ export default function Projects() {
       ],
       link: "https://www.moodofnits.site/",
       featured: false,
+      category: ["fullstack"],
     },
     {
       id: 7,
@@ -152,6 +158,7 @@ export default function Projects() {
       ],
       link: "https://tecventures-frontend.vercel.app/",
       featured: false,
+      category: ["frontend-design"],
     },
     {
       id: 8,
@@ -171,6 +178,7 @@ export default function Projects() {
       ],
       github: "https://github.com/r4inr3aper/MERN-Chat-App",
       featured: false,
+      category: ["fullstack"],
     },
     {
       id: 9,
@@ -192,6 +200,7 @@ export default function Projects() {
       link: "https://ecellnits.org/",
       github: "https://github.com/r4inr3aper/e-cell-website-22",
       featured: false,
+      category: ["fullstack"],
     },
     {
       "id": 10,
@@ -208,20 +217,51 @@ export default function Projects() {
       ],
       "link": "https://ulog-five.vercel.app/",
       "github": "https://github.com/r4inr3aper/ulog-heritage-collective",
-      "featured": false
+      "featured": false,
+      "category": ["frontend-design"]
     }
   ];
 
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+
+  const categories = [
+    { id: "all", label: "All Projects" },
+    { id: "fullstack", label: "Fullstack" },
+    { id: "frontend-design", label: "Frontend & Design" },
+    { id: "ai-ml", label: "AI/ML" },
+  ];
+
+  const filteredProjects =
+    activeCategory === "all"
+      ? projects
+      : projects.filter((project) => project.category.includes(activeCategory));
 
   return (
     <PageTransition>
       <section className="w-full flex flex-col justify-start px-1 mb-6">
         <h2 className="text-xl sm:text-2xl font-medium">Projects ~</h2>
+        
+        {/* Category Filter Buttons */}
+        <div className="flex flex-wrap gap-2 mt-4">
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              onClick={() => setActiveCategory(category.id)}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                activeCategory === category.id
+                  ? "bg-stone-700 text-zinc-100 border border-stone-600 shadow-sm"
+                  : "bg-stone-800/50 text-zinc-400 hover:text-zinc-200 hover:bg-stone-800/70 border border-stone-800"
+              }`}
+            >
+              {category.label}
+            </button>
+          ))}
+        </div>
       </section>
 
       <section className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-        {projects.map((project) => (
+        {filteredProjects.map((project) => (
           <div
             key={project.id}
             className={`border border-stone-800/90 rounded-lg overflow-hidden flex flex-col bg-stone-900/30 transition-all duration-300 hover:shadow-lg hover:shadow-stone-900/50 ${
