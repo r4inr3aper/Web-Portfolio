@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     siteName: 'Bedanta Kataki Portfolio',
     images: [
       {
-        url: '/me.jpeg',
+        url: 'https://images.genius.com/c17eacd4676137d5780d7ec97b48d6d1.816x816x1.jpg',
         width: 1200,
         height: 630,
         alt: 'Bedanta Kataki - Full Stack Developer',
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "Bedanta Kataki - Full Stack Developer Portfolio",
     description: "Full Stack Developer and Electronics & Instrumentation student at NIT Silchar. Specializing in TypeScript, React, Node.js, and modern web technologies.",
-    images: ['/me.jpeg'],
+    images: ['https://images.genius.com/c17eacd4676137d5780d7ec97b48d6d1.816x816x1.jpg'],
     creator: '@bedantaxdev',
   },
   robots: {
