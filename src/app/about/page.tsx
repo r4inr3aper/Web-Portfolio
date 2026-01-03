@@ -47,7 +47,7 @@ export default function About() {
       id: "zs-associates",
       company: "ZS Associates",
       role: "Business Technology Solutions Associate Intern",
-      period: "Jan 2026",
+      period: "Jan 2026 - Present",
       logo: "/zs.png",
       description:
         "Upcoming BTSA intern starting January 2026.",
@@ -58,11 +58,10 @@ export default function About() {
       id: "stealth-startup",
       company: "Stealth Startup",
       role: "Full Stack Developer Intern",
-      period: "Nov 2025 - Present",
+      period: "Nov 2025 - Dec 2025",
       logo: "/stealth.jpeg",
       description:
-        "Built and maintained full-stack systems at a stealth fintech startup using Next.js, TypeScript, Node.js, with database and API integrations.",
-      achievements: [],
+        "Founding engineer building the core fintech product from 0+1 at a stealth startup, owning the full stack (Next.js, TypeScript, Node.js) and shipping fast with a lean team.: [],
     },
     {
       id: "procurpal",
