@@ -61,7 +61,7 @@ export default function About() {
       period: "Nov 2025 - Dec 2025",
       logo: "/stealth.jpeg",
       description:
-        "Founding engineer building the core fintech product from 0+1 at a stealth startup, owning the full stack (Next.js, TypeScript, Node.js) and shipping fast with a lean team.: [],
+        "Founding engineer building the core fintech product from 0→1 at a stealth startup, owning the full stack (Next.js, TypeScript, Node.js) and shipping fast with a lean team.,
     },
     {
       id: "procurpal",
