@@ -218,12 +218,53 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
       }
     };
 
+    const isPlusListSeparator = (item: string) => /^\*\*\+\*\*$|^\+$/.test(item.trim());
+
+    const normalizeListItems = (items: string[]) => {
+      const normalized: Array<string | string[]> = [];
+
+      for (let i = 0; i < items.length; i++) {
+        if (isPlusListSeparator(items[i]) && normalized.length > 0 && i < items.length - 1) {
+          const previous = normalized.pop();
+          if (typeof previous === "string") {
+            normalized.push([previous, items[i + 1]]);
+            i++;
+            continue;
+          }
+          normalized.push(previous as string);
+        }
+
+        normalized.push(items[i]);
+      }
+
+      return normalized;
+    };
+
+    const renderListItemContent = (item: string | string[]) => {
+      if (Array.isArray(item)) {
+        return (
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+            {item.map((part, index) => (
+              <Fragment key={index}>
+                {index > 0 && (
+                  <span className="shrink-0 font-medium text-amber-400/80">+</span>
+                )}
+                <span className="min-w-0 break-words">{renderInlineMarkdown(part)}</span>
+              </Fragment>
+            ))}
+          </div>
+        );
+      }
+
+      return renderInlineMarkdown(item);
+    };
+
     const flushList = (key: string) => {
       if (listItems.length > 0) {
         elements.push(
           <ul key={key} className="list-disc list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
-            {listItems.map((item, i) => (
-              <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
+            {normalizeListItems(listItems).map((item, i) => (
+              <li key={i} className="pl-2 break-words">{renderListItemContent(item)}</li>
             ))}
           </ul>
         );
@@ -234,7 +275,7 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
         elements.push(
           <ol key={`${key}-ol`} className="list-decimal list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
             {orderedListItems.map((item, i) => (
-              <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
+              <li key={i} className="pl-2 break-words">{renderInlineMarkdown(item)}</li>
             ))}
           </ol>
         );
@@ -250,15 +291,15 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
         .filter(Boolean);
 
       elements.push(
-        <div key={key} className="my-5 overflow-x-auto">
-          <div className="mx-auto flex w-max max-w-full flex-nowrap items-center justify-center gap-x-1 rounded-lg border border-stone-800/90 bg-stone-900/40 px-5 py-5">
+        <div key={key} className="my-5 w-full max-w-full overflow-x-auto overscroll-x-contain">
+          <div className="mx-auto flex w-max max-w-none flex-nowrap items-center justify-center gap-x-0.5 rounded-lg border border-stone-800/90 bg-stone-900/40 px-3 py-3 sm:gap-x-1 sm:px-5 sm:py-5">
             {steps.map((step, i) => (
               <Fragment key={i}>
-                <span className="whitespace-nowrap rounded-md bg-stone-800/80 px-2.5 py-1 text-center text-xs font-medium text-zinc-100 sm:text-sm">
+                <span className="shrink-0 whitespace-nowrap rounded-md bg-stone-800/80 px-2 py-1 text-center text-[11px] font-medium text-zinc-100 sm:px-2.5 sm:py-1 sm:text-sm">
                   {step}
                 </span>
                 {i < steps.length - 1 && (
-                  <span className="shrink-0 text-xs text-amber-400/80 sm:text-sm" aria-hidden="true">
+                  <span className="shrink-0 px-0.5 text-[11px] text-amber-400/80 sm:text-sm" aria-hidden="true">
                     →
                   </span>
                 )}
