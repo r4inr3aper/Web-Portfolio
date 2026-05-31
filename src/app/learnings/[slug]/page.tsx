@@ -231,7 +231,9 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
             i++;
             continue;
           }
-          normalized.push(previous as string);
+          if (previous !== undefined) {
+            normalized.push(previous);
+          }
         }
 
         normalized.push(items[i]);
