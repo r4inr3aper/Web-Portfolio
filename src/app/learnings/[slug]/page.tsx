@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 import { PageTransition } from "@/components/animation/page-transition";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { getLearningPostBySlug } from "../data";
-import { use } from "react";
+import { Fragment, use } from "react";
 import { CodeBlock } from "@/components/ui/code-block";
 import Image from "next/image";
 
@@ -19,7 +19,7 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
     return (
       <PageTransition>
         <div className="w-full flex flex-col items-center justify-center py-12 px-4">
-          <h1 className="text-2xl font-semibold text-zinc-100 mb-4">Learning Not Found</h1>
+          <h1 className="text-2xl font-medium text-zinc-100 mb-4">Learning Not Found</h1>
           <p className="text-zinc-400 text-center mb-6">
             The learning post you're looking for doesn't exist or has been removed.
           </p>
@@ -57,11 +57,11 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
         continue;
       }
 
-      // Check for bold (**text**)
-      const boldMatch = text.substring(currentIndex).match(/^\*\*([^*]+)\*\*/);
+      // Check for bold (**text** — allows single * inside for nested italic)
+      const boldMatch = text.substring(currentIndex).match(/^\*\*(.+?)\*\*/);
       if (boldMatch) {
         parts.push(
-          <strong key={`bold-${currentIndex}`} className="font-bold text-zinc-50 font-sans">
+          <strong key={`bold-${currentIndex}`} className="font-medium text-zinc-100">
             {renderInlineMarkdown(boldMatch[1])}
           </strong>
         );
@@ -74,7 +74,7 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
       const highlightMatch = text.substring(currentIndex).match(/^==(.+?)==/);
       if (highlightMatch) {
         parts.push(
-          <mark key={`highlight-${currentIndex}`} className="text-[hsla(32,98%,83%,.9)] font-thin rounded bg-transparent">
+          <mark key={`highlight-${currentIndex}`} className="text-[hsla(32,98%,83%,.9)] font-normal rounded bg-transparent">
             {renderInlineMarkdown(highlightMatch[1])}
           </mark>
         );
@@ -82,15 +82,27 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
         continue;
       }
 
-      // Check for italic (*text* or _text_)
-      const italicMatch = text.substring(currentIndex).match(/^(\*|_)([^*_]+)\1/);
-      if (italicMatch) {
+      // Check for italic (*text* — allows underscores inside)
+      const asteriskItalicMatch = text.substring(currentIndex).match(/^\*([^*]+)\*/);
+      if (asteriskItalicMatch) {
         parts.push(
           <em key={`italic-${currentIndex}`} className="italic text-zinc-200">
-            {renderInlineMarkdown(italicMatch[2])}
+            {renderInlineMarkdown(asteriskItalicMatch[1])}
           </em>
         );
-        currentIndex += italicMatch[0].length;
+        currentIndex += asteriskItalicMatch[0].length;
+        continue;
+      }
+
+      // Check for italic (_text_ — no underscores inside)
+      const underscoreItalicMatch = text.substring(currentIndex).match(/^_([^_]+)_/);
+      if (underscoreItalicMatch) {
+        parts.push(
+          <em key={`italic-u-${currentIndex}`} className="italic text-zinc-200">
+            {renderInlineMarkdown(underscoreItalicMatch[1])}
+          </em>
+        );
+        currentIndex += underscoreItalicMatch[0].length;
         continue;
       }
 
@@ -176,27 +188,107 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
     let inCodeBlock = false;
     let listItems: string[] = [];
     let inList = false;
+    let orderedListItems: string[] = [];
+    let inOrderedList = false;
     let blockquoteItems: string[] = [];
     let inBlockquote = false;
     let noteItems: string[] = [];
     let inNote = false;
     let isFirstHeading = true; // Track first heading to skip it (it's the title)
+    let skipToIndex = -1;
+
+    const flushParagraph = (key: string) => {
+      if (currentParagraph.length > 0) {
+        const text = currentParagraph.join(" ");
+        const isCaption =
+          currentParagraph.length === 1 && /^\*[^*]+\*$/.test(text.trim());
+        elements.push(
+          <p
+            key={key}
+            className={
+              isCaption
+                ? "mb-4 text-center text-xs italic text-zinc-400"
+                : "mb-4 text-sm sm:text-base"
+            }
+          >
+            {renderInlineMarkdown(text)}
+          </p>
+        );
+        currentParagraph = [];
+      }
+    };
+
+    const flushList = (key: string) => {
+      if (listItems.length > 0) {
+        elements.push(
+          <ul key={key} className="list-disc list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
+            {listItems.map((item, i) => (
+              <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
+            ))}
+          </ul>
+        );
+        listItems = [];
+        inList = false;
+      }
+      if (orderedListItems.length > 0) {
+        elements.push(
+          <ol key={`${key}-ol`} className="list-decimal list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
+            {orderedListItems.map((item, i) => (
+              <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
+            ))}
+          </ol>
+        );
+        orderedListItems = [];
+        inOrderedList = false;
+      }
+    };
+
+    const renderFlowDiagram = (codeContent: string, key: string) => {
+      const steps = codeContent
+        .split(/\s*(?:→|->)\s*/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      elements.push(
+        <div key={key} className="my-5 overflow-x-auto">
+          <div className="mx-auto flex w-max max-w-full flex-nowrap items-center justify-center gap-x-1 rounded-lg border border-stone-800/90 bg-stone-900/40 px-5 py-5">
+            {steps.map((step, i) => (
+              <Fragment key={i}>
+                <span className="whitespace-nowrap rounded-md bg-stone-800/80 px-2.5 py-1 text-center text-xs font-medium text-zinc-100 sm:text-sm">
+                  {step}
+                </span>
+                {i < steps.length - 1 && (
+                  <span className="shrink-0 text-xs text-amber-400/80 sm:text-sm" aria-hidden="true">
+                    →
+                  </span>
+                )}
+              </Fragment>
+            ))}
+          </div>
+        </div>
+      );
+    };
 
     lines.forEach((line, index) => {
+      if (index < skipToIndex) return;
       // Code block detection
       if (line.startsWith("```")) {
         if (inCodeBlock) {
           // End code block
           const codeContent = codeBlock.join("\n");
           const lang = codeLanguage || "text";
-          
-          elements.push(
-            <CodeBlock
-              key={`code-block-${index}`}
-              code={codeContent}
-              language={lang}
-            />
-          );
+
+          if (lang === "flow") {
+            renderFlowDiagram(codeContent, `flow-${index}`);
+          } else {
+            elements.push(
+              <CodeBlock
+                key={`code-block-${index}`}
+                code={codeContent}
+                language={lang}
+              />
+            );
+          }
           codeBlock = [];
           codeLanguage = "";
           inCodeBlock = false;
@@ -205,9 +297,9 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
           if (inBlockquote) {
             elements.push(
               <blockquote key={`blockquote-${index}`} className="border-l-4 border-zinc-600 pl-4 my-4 italic text-sm sm:text-base">
-                {blockquoteItems.map((item, i) => (
-                  <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
-                ))}
+                {blockquoteItems.map((item, i) =>
+                  item === "" ? <br key={i} /> : <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
+                )}
               </blockquote>
             );
             blockquoteItems = [];
@@ -232,6 +324,77 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
         return;
       }
 
+      // Horizontal rule
+      if (/^---+$/.test(line.trim())) {
+        flushParagraph(`p-hr-${index}`);
+        flushList(`ul-hr-${index}`);
+        if (inBlockquote) {
+          elements.push(
+            <blockquote key={`blockquote-hr-${index}`} className="border-l border-zinc-600/60 pl-4 my-4 italic text-sm sm:text-base text-zinc-300/90">
+              {blockquoteItems.map((item, i) =>
+                item === "" ? <br key={i} /> : <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
+              )}
+            </blockquote>
+          );
+          blockquoteItems = [];
+          inBlockquote = false;
+        }
+        elements.push(<hr key={`hr-${index}`} className="my-8 border-stone-700/60" />);
+        return;
+      }
+
+      // Markdown table
+      if (line.trim().startsWith("|")) {
+        flushParagraph(`p-table-${index}`);
+        flushList(`ul-table-${index}`);
+        const tableRows: string[][] = [];
+        let j = index;
+        while (j < lines.length && lines[j].trim().startsWith("|")) {
+          const rowLine = lines[j].trim();
+          const isSeparator = /^\|[\s\-:|]+\|$/.test(rowLine);
+          if (!isSeparator) {
+            const cells = rowLine
+              .split("|")
+              .slice(1, -1)
+              .map((cell) => cell.trim());
+            if (cells.length > 0) tableRows.push(cells);
+          }
+          j++;
+        }
+        skipToIndex = j;
+
+        if (tableRows.length > 0) {
+          const [headerRow, ...bodyRows] = tableRows;
+          elements.push(
+            <div key={`table-${index}`} className="my-6 overflow-x-auto rounded-lg border border-stone-800/90">
+              <table className="w-full min-w-[320px] text-sm sm:text-base border-collapse">
+                <thead>
+                  <tr className="border-b border-stone-700/60 bg-stone-900/60">
+                    {headerRow.map((cell, i) => (
+                      <th key={i} className="px-4 py-3 text-left font-medium text-zinc-100">
+                        {renderInlineMarkdown(cell)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {bodyRows.map((row, rowIndex) => (
+                    <tr key={rowIndex} className="border-b border-stone-800/60 last:border-b-0">
+                      {row.map((cell, cellIndex) => (
+                        <td key={cellIndex} className="px-4 py-3 text-zinc-300 align-top">
+                          {renderInlineMarkdown(cell)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+        return;
+      }
+
       // Headings
       if (line.startsWith("# ")) {
         // Skip the first H1 as it's already shown as the page title
@@ -241,10 +404,10 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
         }
         if (inBlockquote) {
           elements.push(
-            <blockquote key={`blockquote-${index}`} className="border-l-4 border-zinc-600 pl-4 my-4 italic text-sm sm:text-base">
-              {blockquoteItems.map((item, i) => (
-                <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
-              ))}
+            <blockquote key={`blockquote-${index}`} className="border-l border-zinc-600/60 pl-4 my-4 italic text-sm sm:text-base text-zinc-300/90">
+              {blockquoteItems.map((item, i) =>
+                item === "" ? <br key={i} /> : <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
+              )}
             </blockquote>
           );
           blockquoteItems = [];
@@ -258,17 +421,7 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
           );
           currentParagraph = [];
         }
-        if (inList) {
-          elements.push(
-            <ul key={`ul-${index}`} className="list-disc list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
-              {listItems.map((item, i) => (
-                <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
-              ))}
-            </ul>
-          );
-          listItems = [];
-          inList = false;
-        }
+        flushList(`flush-${index}`);
         elements.push(
           <h2 key={`h2-${index}`} className="text-xl sm:text-2xl font-medium mt-6 mb-4">
             {renderInlineMarkdown(line.substring(2))}
@@ -280,10 +433,10 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
       if (line.startsWith("## ")) {
         if (inBlockquote) {
           elements.push(
-            <blockquote key={`blockquote-${index}`} className="border-l-4 border-zinc-600 pl-4 my-4 italic text-sm sm:text-base">
-              {blockquoteItems.map((item, i) => (
-                <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
-              ))}
+            <blockquote key={`blockquote-${index}`} className="border-l border-zinc-600/60 pl-4 my-4 italic text-sm sm:text-base text-zinc-300/90">
+              {blockquoteItems.map((item, i) =>
+                item === "" ? <br key={i} /> : <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
+              )}
             </blockquote>
           );
           blockquoteItems = [];
@@ -297,17 +450,7 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
           );
           currentParagraph = [];
         }
-        if (inList) {
-          elements.push(
-            <ul key={`ul-${index}`} className="list-disc list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
-              {listItems.map((item, i) => (
-                <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
-              ))}
-            </ul>
-          );
-          listItems = [];
-          inList = false;
-        }
+        flushList(`flush-${index}`);
         elements.push(
           <h3 key={`h3-${index}`} className="text-lg sm:text-xl font-medium mt-5 mb-4">
             {renderInlineMarkdown(line.substring(3))}
@@ -319,10 +462,10 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
       if (line.startsWith("### ")) {
         if (inBlockquote) {
           elements.push(
-            <blockquote key={`blockquote-${index}`} className="border-l-4 border-zinc-600 pl-4 my-4 italic text-sm sm:text-base">
-              {blockquoteItems.map((item, i) => (
-                <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
-              ))}
+            <blockquote key={`blockquote-${index}`} className="border-l border-zinc-600/60 pl-4 my-4 italic text-sm sm:text-base text-zinc-300/90">
+              {blockquoteItems.map((item, i) =>
+                item === "" ? <br key={i} /> : <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
+              )}
             </blockquote>
           );
           blockquoteItems = [];
@@ -336,17 +479,7 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
           );
           currentParagraph = [];
         }
-        if (inList) {
-          elements.push(
-            <ul key={`ul-${index}`} className="list-disc list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
-              {listItems.map((item, i) => (
-                <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
-              ))}
-            </ul>
-          );
-          listItems = [];
-          inList = false;
-        }
+        flushList(`flush-${index}`);
         elements.push(
           <h4 key={`h4-${index}`} className="text-base sm:text-lg font-medium mt-4 mb-4">
             {renderInlineMarkdown(line.substring(4))}
@@ -356,7 +489,7 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
       }
 
       // NOTE block (special styled note)
-      if (line.trim().toUpperCase().startsWith("> NOTE:") || (inNote && line.startsWith("> "))) {
+      if (line.trim().toUpperCase().startsWith("> NOTE:") || (inNote && (line.startsWith("> ") || line === ">"))) {
         if (!inNote) {
           inNote = true;
           // Close any open blocks
@@ -368,17 +501,7 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
             );
             currentParagraph = [];
           }
-          if (inList) {
-            elements.push(
-              <ul key={`ul-${index}`} className="list-disc list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
-                {listItems.map((item, i) => (
-                  <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
-                ))}
-              </ul>
-            );
-            listItems = [];
-            inList = false;
-          }
+          flushList(`flush-note-${index}`);
           if (inBlockquote) {
             elements.push(
               <blockquote key={`blockquote-${index}`} className="border-l-4 border-zinc-600 pl-4 my-4 italic text-sm sm:text-base">
@@ -414,7 +537,7 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
       }
 
       // Blockquote (regular blockquotes, not notes)
-      if (line.startsWith("> ") && !inNote) {
+      if ((line.startsWith("> ") || line === ">") && !inNote) {
         if (!inBlockquote) {
           inBlockquote = true;
           if (currentParagraph.length > 0) {
@@ -425,44 +548,33 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
             );
             currentParagraph = [];
           }
-          if (inList) {
-            elements.push(
-              <ul key={`ul-${index}`} className="list-disc list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
-                {listItems.map((item, i) => (
-                  <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
-                ))}
-              </ul>
-            );
-            listItems = [];
-            inList = false;
-          }
+          flushList(`flush-note-${index}`);
         }
-        blockquoteItems.push(line.substring(2));
+        // bare ">" is an empty line within the blockquote
+        blockquoteItems.push(line === ">" ? "" : line.substring(2));
         return;
       } else if (inBlockquote && line.trim() === "") {
-        elements.push(
-          <blockquote key={`blockquote-${index}`} className="border-l-4 border-zinc-600 pl-4 my-4 italic text-sm sm:text-base">
-            {blockquoteItems.map((item, i) => (
-              <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
-            ))}
-          </blockquote>
-        );
-        blockquoteItems = [];
-        inBlockquote = false;
-      } else if (inBlockquote && !line.startsWith("> ")) {
-        // Close blockquote if line doesn't start with >
-        elements.push(
-          <blockquote key={`blockquote-${index}`} className="border-l-4 border-zinc-600 pl-4 my-4 italic text-sm sm:text-base">
-            {blockquoteItems.map((item, i) => (
-              <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
-            ))}
-          </blockquote>
-        );
-        blockquoteItems = [];
-        inBlockquote = false;
-      }
-
-      // Skip processing if we're still in blockquote or note
+          elements.push(
+            <blockquote key={`blockquote-${index}`} className="border-l border-zinc-600/60 pl-4 my-4 italic text-sm sm:text-base text-zinc-300/90">
+              {blockquoteItems.map((item, i) =>
+                item === "" ? <br key={i} /> : <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
+              )}
+            </blockquote>
+          );
+          blockquoteItems = [];
+          inBlockquote = false;
+        } else if (inBlockquote && !line.startsWith("> ") && line !== ">") {
+          // Close blockquote if line doesn't start with >
+          elements.push(
+            <blockquote key={`blockquote-${index}`} className="border-l border-zinc-600/60 pl-4 my-4 italic text-sm sm:text-base text-zinc-300/90">
+              {blockquoteItems.map((item, i) =>
+                item === "" ? <br key={i} /> : <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
+              )}
+            </blockquote>
+          );
+          blockquoteItems = [];
+          inBlockquote = false;
+        }      // Skip processing if we're still in blockquote or note
       if (inBlockquote || inNote) {
         return;
       }
@@ -478,28 +590,18 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
           );
           currentParagraph = [];
         }
-        if (inList) {
-          elements.push(
-            <ul key={`ul-${index}`} className="list-disc list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
-              {listItems.map((item, i) => (
-                <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
-              ))}
-            </ul>
-          );
-          listItems = [];
-          inList = false;
-        }
+        flushList(`flush-${index}`);
         const altText = imageMatch[1];
         const imagePath = imageMatch[2];
         elements.push(
           <div key={`image-${index}`} className="my-6 flex justify-center">
-            <div className="relative w-full max-w-2xl">
+            <div className="relative w-full max-w-lg">
               <Image
                 src={imagePath}
                 alt={altText || "Image"}
                 width={800}
-                height={600}
-                className="rounded-lg border border-stone-800/90 shadow-lg"
+                height={1200}
+                className="rounded-lg border border-stone-800/90 shadow-lg w-auto h-auto max-h-[420px] mx-auto block"
                 unoptimized
               />
               {altText && (
@@ -511,31 +613,31 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
         return;
       }
 
-      // List items
+      // Ordered list items (1. 2. etc.)
+      const orderedListMatch = line.match(/^(\d+)\.\s+(.+)/);
+      if (orderedListMatch) {
+        if (!inOrderedList) {
+          flushParagraph(`p-ol-${index}`);
+          flushList(`ul-before-ol-${index}`);
+          inOrderedList = true;
+        }
+        orderedListItems.push(orderedListMatch[2]);
+        return;
+      } else if (inOrderedList) {
+        flushList(`ol-${index}`);
+      }
+
+      // Unordered list items
       if (line.startsWith("- ") || line.startsWith("* ")) {
         if (!inList) {
+          flushParagraph(`p-ul-${index}`);
+          flushList(`ol-before-ul-${index}`);
           inList = true;
-          if (currentParagraph.length > 0) {
-            elements.push(
-              <p key={`p-${index}`} className="mb-4 text-sm sm:text-base">
-                {renderInlineMarkdown(currentParagraph.join(" "))}
-              </p>
-            );
-            currentParagraph = [];
-          }
         }
         listItems.push(line.substring(2));
         return;
-      } else if (inList) {
-        elements.push(
-            <ul key={`ul-${index}`} className="list-disc list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
-            {listItems.map((item, i) => (
-              <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
-            ))}
-          </ul>
-        );
-        listItems = [];
-        inList = false;
+      } else if (inList || inOrderedList) {
+        flushList(`ul-${index}`);
       }
 
       // Regular paragraph
@@ -562,10 +664,10 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
 
     if (blockquoteItems.length > 0) {
       elements.push(
-        <blockquote key="blockquote-final" className="border-l-4 border-zinc-600 pl-4 my-4 italic text-sm sm:text-base">
-          {blockquoteItems.map((item, i) => (
-            <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
-          ))}
+        <blockquote key="blockquote-final" className="border-l border-zinc-600/60 pl-4 my-4 italic text-sm sm:text-base text-zinc-300/90">
+          {blockquoteItems.map((item, i) =>
+            item === "" ? <br key={i} /> : <p key={i} className="mb-1 last:mb-0">{renderInlineMarkdown(item)}</p>
+          )}
         </blockquote>
       );
     }
@@ -578,15 +680,7 @@ export default function LearningPostPage({ params }: LearningPostPageProps) {
       );
     }
 
-    if (listItems.length > 0) {
-      elements.push(
-        <ul key="ul-final" className="list-disc list-outside space-y-1 mb-4 ml-6 text-sm sm:text-base">
-          {listItems.map((item, i) => (
-            <li key={i} className="pl-2">{renderInlineMarkdown(item)}</li>
-          ))}
-        </ul>
-      );
-    }
+    flushList("list-final");
 
     return elements;
   };

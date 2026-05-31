@@ -156,7 +156,7 @@ export default function Contact() {
         <h3 className="text-lg sm:text-xl font-medium mb-6">Find me here ~</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-y-6 gap-x-12">
           <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">Email</p>
+            <p className="mb-2 text-zinc-400 font-medium text-sm">Email</p>
             <a
               href="mailto:bedanta.074@gmail.com"
               className="text-white hover:opacity-80 transition-opacity underline"
@@ -166,7 +166,7 @@ export default function Contact() {
             </a>
           </div>
           <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">GitHub</p>
+            <p className="mb-2 text-zinc-400 font-medium text-sm">GitHub</p>
             <a
               href="https://github.com/r4inr3aper"
               className="text-white hover:opacity-80 transition-opacity underline"
@@ -176,7 +176,7 @@ export default function Contact() {
             </a>
           </div>
           <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">Leetcode</p>
+            <p className="mb-2 text-zinc-400 font-medium text-sm">Leetcode</p>
             <a
               href="https://leetcode.com/u/xbedanta/"
               className="text-white hover:opacity-80 transition-opacity underline"
@@ -186,7 +186,7 @@ export default function Contact() {
             </a>
           </div>
           <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">LinkedIn</p>
+            <p className="mb-2 text-zinc-400 font-medium text-sm">LinkedIn</p>
             <a
               href="https://www.linkedin.com/in/bedanta-kataki-0b5205257/"
               className="text-white hover:opacity-80 transition-opacity underline"
@@ -196,7 +196,7 @@ export default function Contact() {
             </a>
           </div>
           <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">X (formerly Twitter)</p>
+            <p className="mb-2 text-zinc-400 font-medium text-sm">X (formerly Twitter)</p>
             <a
               href="https://x.com/bedantaxdev"
               className="text-white hover:opacity-80 transition-opacity underline"
@@ -206,7 +206,7 @@ export default function Contact() {
             </a>
           </div>
           {/* <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">CV</p>
+            <p className="mb-2 text-zinc-400 font-medium text-sm">CV</p>
             <a
               href="https://read.cv/bedanta"
               className="text-white hover:opacity-80 transition-opacity underline"

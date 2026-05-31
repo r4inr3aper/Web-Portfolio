@@ -291,7 +291,7 @@ export default function Projects() {
             </div>
 
             <div className="p-4 flex flex-col gap-2 flex-grow">
-              <h3 className="text-lg font-semibold text-zinc-100">
+              <h3 className="text-lg font-medium text-zinc-100">
                 {project.name}
               </h3>
               <p className="text-xs text-zinc-300 line-clamp-2">

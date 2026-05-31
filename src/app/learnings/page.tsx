@@ -3,6 +3,10 @@ import { PageTransition } from "@/components/animation/page-transition";
 import Link from "next/link";
 import { learningPosts } from "./data";
 
+const sortedPosts = [...learningPosts].sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+);
+
 export default function Learnings() {
   return (
     <PageTransition>
@@ -16,13 +20,13 @@ export default function Learnings() {
 
       {/* Learning Posts List */}
       <section className="w-full flex flex-col gap-6">
-        {learningPosts.map((post) => (
+        {sortedPosts.map((post) => (
           <Link
             key={post.id}
             href={`/learnings/${post.slug}`}
             className="group border border-stone-800 rounded-lg p-4 hover:bg-zinc-900/40 transition-colors"
           >
-            <h3 className="text-base sm:text-lg font-semibold text-zinc-100 mb-1">
+            <h3 className="text-base sm:text-lg font-medium text-zinc-100 mb-1">
               {post.title}
             </h3>
             <p className="text-sm text-zinc-400">
@@ -47,4 +51,3 @@ export default function Learnings() {
     </PageTransition>
   );
 }
-

@@ -3,16 +3,19 @@ import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Bedanta Kataki - Full Stack Developer Portfolio | Home",
-  description: "Welcome to Bedanta Kataki's portfolio. Full Stack Developer and Electronics & Instrumentation student at NIT Silchar. Specializing in TypeScript, React, Node.js, and modern web technologies.",
+  title: "Bedanta Kataki - Full Stack AI Engineer Portfolio | Home",
+  description: "Welcome to Bedanta Kataki's portfolio. Full Stack AI Engineer and Electronics & Instrumentation student at NIT Silchar. Building RAG pipelines, agentic systems, and modern web apps with TypeScript, Python, LangGraph, and React.",
   keywords: [
     "Bedanta Kataki",
-    "Full Stack Developer",
+    "Full Stack AI Engineer",
+    "AI Engineer",
     "Portfolio",
     "NIT Silchar",
     "TypeScript",
+    "LangGraph",
+    "RAG",
     "React",
-    "Node.js",
+    "Python",
     "Web Development"
   ],
 };
@@ -33,28 +36,32 @@ export default function Home() {
             theo
           </span>{" "}
           said{" "}
-          <mark className="text-[hsla(32,98%,83%,.9)] font-thin rounded">
+          <mark className="text-[hsla(32,98%,83%,.9)] font- rounded">
             typesafety isn&apos;t optional
           </mark>{" "}
           apparently &amp; btw I don&apos;t use neovim.
         </p>
         <p className="mb-4 text-sm sm:text-base">
-          I&apos;m a fullstack dev, student at{" "}
+          I&apos;m a full stack AI engineer &amp; dev, student at{" "}
           <span className="text-white hover:opacity-80 transition-opacity underline cursor-pointer">
             NIT
           </span>
             , oasis fanboy, technical writer (when inspiration hits), shitposter,
             hackathon grinder and currently on{" "}
-            <mark className="text-[hsla(32,98%,83%,.9)] font-thin rounded">
+            <mark className="text-[hsla(32,98%,83%,.9)] font-normal rounded">
               Leetcode
             </mark>
-            {" "} grind too. I can write typescript, python, cpp. I enjoy sneaking{" "}
-          <mark className="text-[hsla(32,98%,83%,.9)] font-thin rounded">
+            {" "} grind too. I can write typescript, python, cpp, and I ship{" "}
+          <mark className="text-[hsla(32,98%,83%,.9)] font-normal rounded">
+            LLM-powered systems
+          </mark>
+          : RAG pipelines, knowledge graphs, agent workflows with LangGraph. I enjoy sneaking{" "}
+          <mark className="text-[hsla(32,98%,83%,.9)] font-normal rounded">
             GraphQL{" "}
           </mark>{" "}
           into projects whenever I can ~ I just like when things are structured
           but flexible.{" "}
-          <mark className="text-[hsla(32,98%,83%,.9)] font-thin rounded">
+          <mark className="text-[hsla(32,98%,83%,.9)] font-normal rounded">
             System design?{" "}
           </mark>{" "}
           Love it. Nothing beats the thrill of watching complex parts fall into
@@ -72,7 +79,7 @@ export default function Home() {
             VALORANT
           </span>
           , lifting{" "}
-          <mark className="text-[hsla(32,98%,83%,.9)] font-thin rounded">
+          <mark className="text-[hsla(32,98%,83%,.9)] font-normal rounded">
             weights
           </mark>
           , clutching in Table Tennis and binge watching shows on{" "}
@@ -117,7 +124,7 @@ export default function Home() {
         <h2 className="text-xl sm:text-2xl font-medium mb-6">Find me here ~</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-y-6 gap-x-12">
           <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">GitHub</p>
+            <p className="mb-2 text-zinc-400 font-medium text-sm">GitHub</p>
             <a
               href="https://github.com/r4inr3aper"
               className="text-white hover:opacity-80 transition-opacity underline"
@@ -127,7 +134,7 @@ export default function Home() {
             </a>
           </div>
           <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">Leetcode</p>
+            <p className="mb-2 text-zinc-400 font-medium text-sm">Leetcode</p>
             <a
               href="https://leetcode.com/u/xbedanta/"
               className="text-white hover:opacity-80 transition-opacity underline"
@@ -137,7 +144,7 @@ export default function Home() {
             </a>
           </div>
           <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">
+            <p className="mb-2 text-zinc-400 font-medium text-sm">
               X (formerly Twitter)
             </p>
             <a
@@ -149,7 +156,7 @@ export default function Home() {
             </a>
           </div>
           <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">LinkedIn</p>
+            <p className="mb-2 text-zinc-400 font-medium text-sm">LinkedIn</p>
             <a
               href="https://www.linkedin.com/in/bedanta-kataki-0b5205257/"
               target="_blank"
@@ -159,7 +166,7 @@ export default function Home() {
             </a>
           </div>
           <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">Email</p>
+            <p className="mb-2 text-zinc-400 font-medium text-sm">Email</p>
             <a
               href="mailto:bedanta.074@gmail.com"
               target="_blank"
@@ -169,7 +176,7 @@ export default function Home() {
             </a>
           </div>
           {/* <div>
-            <p className="mb-2 text-zinc-400 font-semibold text-sm">CV</p>
+            <p className="mb-2 text-zinc-400 font-medium text-sm">CV</p>
             <a
               href="https://read.cv/bedanta"
               target="_blank"

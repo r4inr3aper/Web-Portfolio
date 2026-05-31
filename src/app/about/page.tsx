@@ -13,34 +13,52 @@ export default function About() {
     }));
   };
 
-  const skills = {
-    Languages: ["C/C++", "JavaScript", "TypeScript", "Python", "HTML", "CSS"],
-    Databases: [
-      "MongoDB",
-      "DynamoDB",
-      "SQL",
-      "QdrantDB",
-      "Neo4j",
-      "Pinecone",
-      "PGVector",
-      "PostgreSQL",
-      "Redis",
-    ],
-    Frameworks: ["Express.js", "React.js", "Langchain.js", "Node.js"],
-    "Tools & Technologies": [
-      "Git",
-      "REST API",
-      "GraphQL",
-      "Serverless",
-      "Docker",
-      "AWS",
-      "WebSockets",
-      "Vercel",
-      "Power BI",
-      "MS Excel",
-      "VS Code",
-    ],
-  };
+  const skillCategories = [
+    {
+      title: "Languages",
+      skills: ["C/C++", "JavaScript", "TypeScript", "Go", "Python", "HTML", "CSS"],
+    },
+    {
+      title: "Frameworks",
+      skills: ["Next.js", "React.js", "Express.js", "LangGraph", "LangChain", "Langchain.js", "Node.js"],
+    },
+    {
+      title: "AI & ML",
+      skills: ["Knowledge Graphs", "Machine Learning", "Deep Learning", "Generative AI", "Transformers"],
+    },
+    {
+      title: "Databases",
+      skills: [
+        "MongoDB",
+        "DynamoDB",
+        "SQL",
+        "QdrantDB",
+        "Neo4j",
+        "Pinecone",
+        "PGVector",
+        "PostgreSQL",
+        "Redis",
+        "OpenSearch",
+      ],
+    },
+    {
+      title: "Tools & Technologies",
+      skills: [
+        "Git",
+        "REST API",
+        "GraphQL",
+        "AWS (EC2, Lambda, S3)",
+        "Docker",
+        "Azure DevOps",
+        "WebSockets",
+        "Elasticsearch",
+        "Postman",
+        "VS Code",
+        "Power BI",
+        "MS Excel",
+      ],
+    },
+  ];
 
   const experiences = [
     {
@@ -50,8 +68,14 @@ export default function About() {
       period: "Jan 2026 - Present",
       logo: "/zs.png",
       description:
-        "Upcoming BTSA intern starting January 2026.",
-      achievements: [],
+        "Building Graph RAG with LangGraph on medical knowledge graphs owning retrieval, streaming and production infra end-to-end.",
+      achievements: [
+        "Architected a Graph RAG backend over large-scale medical knowledge graphs using Neo4j, OpenSearch and LLM-based agent workflows.",
+        "Designed retrieval, recommendation, follow-up and thought-streaming pipelines supporting 500+ benchmark KBQs and production conversational workflows.",
+        "Scaled low-latency conversational AI infrastructure with SSE streaming, graph visualization, cancellation handling and SSO authentication for real-time interactions.",
+        "Increased production reliability by resolving 25+ frontend/backend issues and optimizing latency through profiling, retrieval evaluation and multi-model benchmarking.",
+        "Tech Stack: Python, LangGraph, Neo4j, FastAPI, Docker, Knowledge Graphs, Natural Language Processing, Vector Embeddings, ElasticSearch, LLMs",
+      ],
       link: "https://www.zs.com/"
     },
     {
@@ -99,11 +123,14 @@ export default function About() {
       <section className="w-full flex flex-col justify-start p-[0.4rem] mb-4">
         <h2 className="text-xl sm:text-2xl font-medium mb-4">About ~</h2>
         <p className="mb-4 text-sm sm:text-base">
-          Full-stack developer specializing in robust, scalable web apps for high-traffic and complex use cases, with experience delivering platforms handling 1M+ API requests.
+          Full Stack AI Engineer who builds production AI systems end-to-end, from {" "}
+          <mark className="text-[hsla(32,98%,83%,.9)] font-normal rounded">RAG pipelines</mark>{" "}
+          and {" "}
+          <mark className="text-[hsla(32,98%,83%,.9)] font-normal rounded">agent workflows</mark>{" "}
+          to robust, scalable web apps for high-traffic and complex use cases, with experience delivering platforms handling 1M+ API requests.
         </p>
         <p className="mb-4 text-sm sm:text-base">
-          Currently exploring {" "}
-          <mark className="text-[hsla(32,98%,83%,.9)] font-thin rounded">GenAI</mark>{" "} and <mark className="text-[hsla(32,98%,83%,.9)] font-thin rounded">Agentic AI</mark>{" "} integration, along with improving DX through better tooling and workflows. I focus on clean architecture and creating applications that perform reliably at scale.
+          I work across the full stack of AI engineering: knowledge graphs, vector retrieval, LLM orchestration with LangGraph/LangChain, and streaming conversational infra, plus the frontend and backend that ships it to production. I focus on clean architecture, reliable systems at scale, and improving DX through better tooling and workflows.
         </p>
       </section>
 
@@ -119,7 +146,7 @@ export default function About() {
           <div className="flex items-start gap-4 mb-4">
             <div className="w-16 h-16 bg-white p-[4px] rounded-md overflow-hidden flex items-center justify-center shrink-0">
               <img
-                src="https://gyaanarth.com/wp-content/uploads/2022/09/logo.jpg"
+                src="/nits.png"
                 alt="College logo"
                 className="w-full h-full object-cover"
               />
@@ -157,7 +184,7 @@ export default function About() {
             </div>
           </div>
           <p className="text-sm text-zinc-200 mt-2 leading-relaxed">
-            Currently pursuing my bachelor&apos;s degree with a focus on full-stack development and 
+            Currently pursuing my bachelor&apos;s degree with a focus on full-stack development, AI engineering, and 
             modern web technologies. Actively participating in hackathons and tech events.
           </p>
         </div>
@@ -266,13 +293,13 @@ export default function About() {
       {/* Skills Section */}
       <section className="w-full flex flex-col justify-start p-[0.4rem] mb-8">
         <h2 className="text-xl sm:text-2xl font-medium mb-4">Skills ~</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {Object.entries(skills).map(([category, skillList]) => (
-            <div key={category} className="mb-6">
-              <h3 className="text-lg font-medium mb-4 text-zinc-200">{category}</h3>
+
+        <div className="flex flex-col gap-8">
+          {skillCategories.map(({ title, skills }) => (
+            <div key={title}>
+              <h3 className="text-lg font-medium mb-4 text-zinc-200">{title}</h3>
               <div className="flex flex-wrap gap-2">
-                {skillList.map((skill) => (
+                {skills.map((skill) => (
                   <span
                     key={skill}
                     className="px-3.5 py-1.5 bg-stone-800/80 text-zinc-200 text-sm rounded-full hover:bg-stone-700/90 transition-all duration-200 hover:shadow-md"

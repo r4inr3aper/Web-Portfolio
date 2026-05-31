@@ -15,10 +15,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  // Use fuselogo.png for fuzzy search post, default image for others
-  const ogImage = post.slug === "making-search-feel-smart-without-ai" 
-    ? "https://xbedanta.vercel.app/learnings/fuselogo.png"
-    : "https://xbedanta.vercel.app/me.jpeg";
+  // Use specific OG images for certain posts, fallback to default
+  let ogImage = "https://xbedanta.vercel.app/me.jpeg";
+
+  if (post.slug === "making-search-feel-smart-without-ai") {
+    ogImage = "https://xbedanta.vercel.app/learnings/fuselogo.png";
+  } else if (post.slug === "mapping-the-rag-iceberg") {
+    ogImage = "https://xbedanta.vercel.app/iceberg.jpg";
+  }
 
   return {
     title: `${post.title} - Bedanta Kataki`,

@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 export default function NotFound() {
   return (
     <div className="w-full flex flex-col items-center justify-center py-12 px-4">
-      <h1 className="text-2xl font-semibold text-zinc-100 mb-4">Learning Not Found</h1>
+      <h1 className="text-2xl font-medium text-zinc-100 mb-4">Learning Not Found</h1>
       <p className="text-zinc-400 text-center mb-6">
         The learning post you're looking for doesn't exist or has been removed.
       </p>
