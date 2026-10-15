@@ -129,3 +129,30 @@
 .animate-expandWidth {
   animation: expandWidth 0.1s forwards;
 }
+
+@media (max-width: 767px) {
+  html.pellet-town-immersive,
+  body.pellet-town-immersive {
+    overflow: hidden;
+    height: 100dvh;
+  }
+
+  body.pellet-town-immersive [data-site-header],
+  body.pellet-town-immersive [data-site-footer] {
+    display: none;
+  }
+
+  body.pellet-town-immersive [data-site-main] {
+    width: 100vw;
+    max-width: 100vw;
+    min-height: 100dvh;
+    padding: 0;
+    margin: 0;
+    gap: 0;
+  }
+
+  body.pellet-town-immersive [data-site-main] > div {
+    gap: 0;
+    height: 100dvh;
+  }
+}

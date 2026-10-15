@@ -5,11 +5,30 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FileText, Home, User, FolderKanban, BookOpen, Mail } from "lucide-react";
 
+const EASTER_EGG_STORAGE_KEY = "pellet-town-unlocked";
+const KONAMI_SEQUENCE = [
+  "arrowup",
+  "arrowup",
+  "arrowdown",
+  "arrowdown",
+  "arrowleft",
+  "arrowright",
+  "arrowleft",
+  "arrowright",
+  "b",
+  "a",
+] as const;
+
 export function Header() {
   const pathname = usePathname();
   const indicatorRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [isGameUnlocked, setIsGameUnlocked] = useState(false);
+  const [showUnlockBanner, setShowUnlockBanner] = useState(false);
+  const avatarTapCountRef = useRef(0);
+  const avatarTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sequenceProgressRef = useRef(0);
 
   const navItems = [
     { label: "Home", path: "/", icon: Home },
@@ -18,6 +37,73 @@ export function Header() {
     { label: "Learnings", path: "/learnings", icon: BookOpen },
     { label: "Contact", path: "/contact", icon: Mail },
   ];
+
+  const unlockEasterEgg = () => {
+    if (isGameUnlocked) {
+      return;
+    }
+
+    setIsGameUnlocked(true);
+    setShowUnlockBanner(true);
+    window.localStorage.setItem(EASTER_EGG_STORAGE_KEY, "true");
+
+    window.setTimeout(() => {
+      setShowUnlockBanner(false);
+    }, 2800);
+  };
+
+  const handleAvatarTap = () => {
+    avatarTapCountRef.current += 1;
+
+    if (avatarTapTimerRef.current) {
+      clearTimeout(avatarTapTimerRef.current);
+    }
+
+    avatarTapTimerRef.current = setTimeout(() => {
+      avatarTapCountRef.current = 0;
+    }, 1800);
+
+    if (avatarTapCountRef.current >= 5) {
+      unlockEasterEgg();
+      avatarTapCountRef.current = 0;
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (window.localStorage.getItem(EASTER_EGG_STORAGE_KEY) === "true") {
+      setIsGameUnlocked(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleSecretSequence = (event: KeyboardEvent) => {
+      const pressed = event.key.toLowerCase();
+      const expected = KONAMI_SEQUENCE[sequenceProgressRef.current];
+
+      if (pressed === expected) {
+        sequenceProgressRef.current += 1;
+      } else {
+        sequenceProgressRef.current = pressed === KONAMI_SEQUENCE[0] ? 1 : 0;
+      }
+
+      if (sequenceProgressRef.current === KONAMI_SEQUENCE.length) {
+        unlockEasterEgg();
+        sequenceProgressRef.current = 0;
+      }
+    };
+
+    window.addEventListener("keydown", handleSecretSequence);
+    return () => {
+      window.removeEventListener("keydown", handleSecretSequence);
+      if (avatarTapTimerRef.current) {
+        clearTimeout(avatarTapTimerRef.current);
+      }
+    };
+  }, [isGameUnlocked]);
 
   useEffect(() => {
     if (!navRef.current || !indicatorRef.current) return;
@@ -89,7 +175,9 @@ export function Header() {
             alt="bedanta"
             width={60}
             height={60}
-            className="rounded-full w-14 h-14 object-cover transition-transform hover:scale-105 duration-300"
+            className="rounded-full w-14 h-14 object-cover transition-transform hover:scale-105 duration-300 cursor-pointer"
+            onClick={handleAvatarTap}
+            title="tap if curious"
           />
           <div className="flex flex-col gap-2 justify-center">
             <h2 className="mb-0">bedanta</h2>
@@ -115,6 +203,12 @@ export function Header() {
 
       {/* Navigation */}
       <div className="border border-stone-800/90 p-2 sm:p-[0.4rem] rounded-lg mb-12 sticky top-4 z-[100] bg-stone-900/80 backdrop-blur-md">
+        {showUnlockBanner && (
+          <div className="mb-2 rounded-md border border-amber-200/30 bg-amber-100/10 px-3 py-2 text-xs text-amber-100">
+            Secret route unlocked. Use the <span className="font-medium">Interactive Resume</span> chip.
+          </div>
+        )}
+
         <nav
           ref={navRef}
           className="flex gap-2 sm:gap-2 relative justify-start w-full z-[100] rounded-lg"

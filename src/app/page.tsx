@@ -1,5 +1,6 @@
 import { PageTransition } from "@/components/animation/page-transition";
 import Image from "next/image";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -25,6 +26,12 @@ export default function Home() {
     <PageTransition>
       <section className="w-full flex flex-col justify-start p-[0.4rem] mb-8">
         <h2 className="text-xl sm:text-2xl font-medium mb-4">Hello ~</h2>
+        <Link
+          href="/labs/pellet-town"
+          className="mb-4 inline-flex w-fit items-center rounded-full border border-amber-300/30 bg-amber-100/10 px-3 py-1 text-xs tracking-[0.08em] text-amber-100 no-underline transition-colors hover:bg-amber-100/20"
+        >
+          Play Interactive Resume (Beta)
+        </Link>
         <p className="mb-4 text-sm sm:text-base">
           22 y/o semicolon dev trying to build better web interfaces. taught by
           the web itself, I write typescript, I love mern stack but I use the{" "}

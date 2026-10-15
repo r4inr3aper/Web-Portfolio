@@ -1,0 +1,128 @@
+Creating a map using tiles: we can creating this using an array in js (like that in pacman) but as this metaverse is a very high detailed game, so we use tile map editor
+itch.io for game assets (its a top down game) -> download 12x12 tile set
+new tilset -> 12px x 12px  
+new map -> 1024 x 576px , 70 x 40 tiles 
+layering in tiles -> water -> land -> house
+bucket -> randomizer tool to create a randomized grid for water
+selecting the correct tile piece (middle) to fill the island
+tile layering for a plateau, trees -> when you want to layer similar tiles on the top of each other, you create new tiles 
+add sand on the bottom on upper grass 
+
+collisions and map boundaries: when our player is placed on the screen, it shows the locations the map where it cannot go like water, house, sides of island etc
+collisons: square tiles to detect boundaries and stop the players movement
+new tiles -> collision red png (can move diagonally)
+give boundary around plateau
+
+we export the whole image (base layer) as one without the collisions and again once just with the collisions (as objects) and foreground layers
+collisions are bunch of block we place on the game programatically for collision detection
+
+drawing foreground layers: objects over which our player is able to travel behind
+export as image -> only include visible layers -> export as .png
+place the player and move the map -> illusion as if player is moving
+
+IMPORT AND RENDER MAP
+zoom in 400% and export with use current zoom level
+
+PLAYER CREATION
+
+we follow an order for onload function as every img needs different time to load and they seem to overlap if not handled properly
+
+    c.drawImage(player, canvas.width/2 - player.width/2, canvas.height/2 - player.height/2)
+    -> to move the player to the center
+
+    c.drawImage(
+        player,
+        0, (to begin cropping from in the x-axis)
+        0, (to begin cropping from in the y-axis)
+        0, (crop width in x-axis)
+        0, (crop width in y-axis)
+        canvas.width/2 - player.width/8, (actual position of the image)
+        canvas.height/2 - player.height/2,
+        0, (actual height of the image to be rendered out at)
+        0  (actual width of the image to be rendered out at)
+    )
+
+event listener keydown to detect the player and perform the necessary movements
+
+window.requestAnimationFrame(animate) -> recursive function to watch for animation
+we make classes to make the code cleaner (by not taking seperate individual lets for bgX and all)
+
+adding animate(), keys objects and event listeners to move the map on w,a,s,d keys.
+add last key pressed to add the functionality of changing direction even when one key is pressed
+
+
+ADDING COLLISIONS
+
+export collision from tiles as json map file
+take out the collision data and paste it in a json file
+
+we will convert the 1d collisions array into 2d collisions array
+1> width of our map is 70 tiles wide, which is important to iterate through the for loop to detect collisions 
+2> slice them
+3> store in new array -> parse out canvas objects in accordance to the array
+4> tiles pe the size of boundaries was 12x12 but we zoomed in 400%, so height and width would be 48x48
+5> everywhere there's a 1025, we are gonna push a new boundary into our boundaries array
+6> adjust the position of collions in accordance to the sprite by creating an offset object
+7> make sure horizontal and vertical offset in tiles in zero (check in case there's mis-alignment in collisions)
+8> we want the collision to render above the map and behind the chracter so we order the function accordingly
+9> for adding moveables try moving the collions blocks along bg, using the moveables array
+10> at first add just one block and try to add interactions to it and then apply the interactions to all
+
+
+COLLISION DETECTION
+
+right side of player = x.cord + width of the player
+if(right side of the player > left side of the box) collision happens
+refactor the existing player draw image into a seperate class constructor
+
+class Sprite {
+  constructor({ position, image }) {
+    this.position = position;
+    this.image = image;
+  }
+
+  draw() {
+    c.drawImage(this.image, this.position.x, this.position.y);
+    
+  }
+}
+we use frames to cut out the amount of image that we want to use
+// canvas.width / 2 - this.image.width / 8,
+// canvas.height / 2 - this.image.height / 2,
+add static dimensions in player image width than this. get the image size from the info
+  if (
+    player.position.x + player.width >= testBoundary.position.x &&
+    player.position.x <= testBoundary.position.x + testBoundary.width &&
+    player.position.y + player.height >= testBoundary.position.y &&
+    player.position.y <= testBoundary.position.y + testBoundary.height  
+    ) {
+        console.log('bro');
+    }
+
+const testBoundary = new Boundary({
+  position: {
+    x: 400,
+    y: 400,
+  },
+});
+
+const moveables = [bg, ...boundaries]; every item of boundaries is there in the array
+we go into the future to check for boundary collision by checking for every boundary if it is collides with any block for y/x+=3
+(might cause issue in multiplayer model, as we check for every boundary -> so check for that)
+
+
+FOREGROUND OBJECTS
+
+export the foreground image as 400% zoom
+render it at last
+create a new sprite foreground object
+add foreground to moveables const
+increment the x of the image by 48 to make it look like its moving
+
+CHARACTER ANIMATION
+
+we just keep on sliding between the image of the from left to right, by adding a frames.val which varies from 0 to 4
+4 x 48
+slow it down by 10 frames
+swap out the character image depending on the directional key we are pressing
+the animation stops when i lift up the key

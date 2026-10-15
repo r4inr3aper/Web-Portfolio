@@ -62,19 +62,36 @@ export default function About() {
 
   const experiences = [
     {
-      id: "zs-associates",
+      id: "zs-full-time",
+      company: "ZS Associates",
+      role: "AI Engineering Associate",
+      period: "Jul 2026 - Present",
+      logo: "/zs.png",
+      description:
+        "Built and shipped a 0->prod agentic stack end-to-end, then hardened it in production with self-healing LLM failover, security/RCA fixes, and a Databricks-ready gold layer.",
+      achievements: [
+        "Zero to prod on a new asset type: frontend, backend, agents, RAG, ingestion, testing and deployment end-to-end.",
+        "Built self-healing LLM failover: model is benched on failure, auto-probed, then reintroduced without manual intervention.",
+        "Shipped a user analytics dashboard, prototyped MCP agents, closed security gaps and ran RCA on ingestion pipelines.",
+        "Built the gold layer of an agentic data platform on medallion architecture, where deep agents ship deploy-ready artifacts to Databricks.",
+        "Tech Stack: Python, FastAPI, LangGraph, Neo4j, OpenSearch, Deep Agents, MCP, Databricks",
+      ],
+      link: "https://www.zs.com/"
+    },
+    {
+      id: "zs-internship",
       company: "ZS Associates",
       role: "Business Technology Solutions Associate Intern",
-      period: "Jan 2026 - Present",
+      period: "Jan 2026 - Jun 2026",
       logo: "/zs.png",
       description:
         "Building Graph RAG with LangGraph on medical knowledge graphs owning retrieval, streaming and production infra end-to-end.",
       achievements: [
-        "Architected a Graph RAG backend over large-scale medical knowledge graphs using Neo4j, OpenSearch and LLM-based agent workflows.",
-        "Designed retrieval, recommendation, follow-up and thought-streaming pipelines supporting 500+ benchmark KBQs and production conversational workflows.",
-        "Scaled low-latency conversational AI infrastructure with SSE streaming, graph visualization, cancellation handling and SSO authentication for real-time interactions.",
-        "Increased production reliability by resolving 25+ frontend/backend issues and optimizing latency through profiling, retrieval evaluation and multi-model benchmarking.",
-        "Tech Stack: Python, LangGraph, Neo4j, FastAPI, Docker, Knowledge Graphs, Natural Language Processing, Vector Embeddings, ElasticSearch, LLMs",
+        "Built a Graph RAG backend over medical knowledge graphs using Neo4j, OpenSearch and LLM agents.",
+        "Streamed agent reasoning to the UI in real time over SSE and validated against 500+ benchmark KBQs.",
+        "Ran RCA on hard failures: bad Cypher, empty traversals and race conditions; tuned agents and rules to reach 87% accuracy.",
+        "Profiled with flame graphs, analyzed graph cardinality, ran t-SNE on KG metadata, compared semantic vs hybrid vs fuzzy retrieval, and fixed 25+ bugs.",
+        "Tech Stack: Python, FastAPI, LangGraph, Neo4j (Cypher, GDS), OpenSearch, PostgreSQL, Docker, SSE, Pydantic, Knowledge Graphs, Graph RAG, Vector Embeddings, LLMs, NLP",
       ],
       link: "https://www.zs.com/"
     },
@@ -184,7 +201,7 @@ export default function About() {
             </div>
           </div>
           <p className="text-sm text-zinc-200 mt-2 leading-relaxed">
-            Currently pursuing my bachelor&apos;s degree with a focus on full-stack development, AI engineering, and 
+            Pursued my bachelor&apos;s degree with a focus on full-stack development, AI engineering, and 
             modern web technologies. Actively participating in hackathons and tech events.
           </p>
         </div>

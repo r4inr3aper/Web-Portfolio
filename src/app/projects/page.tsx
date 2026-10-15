@@ -51,6 +51,30 @@ export default function Projects() {
       category: ["fullstack"],
     },
     {
+      id: 11,
+      name: "Terminal Agent",
+      description:
+        "CLI coding agent that uses OpenRouter (OpenAI-compatible API) with tool-calling for Read/Write/Bash to execute iterative code-edit loops.",
+      image: "/terminal-agent.webp",
+      imageAlt: "Terminal Agent project preview",
+      techStack: ["Python", "OpenAI SDK", "OpenRouter API", "Function Calling", "CLI", "Subprocess"],
+      github: "https://github.com/r4inr3aper/terminal-agent",
+      featured: false,
+      category: ["ai-ml", "fullstack"],
+    },
+    {
+      id: 12,
+      name: "Redis from Scratch",
+      description:
+        "Implemented a Redis-style TCP server from scratch with threaded client handling and RESP-based command processing modules.",
+      image: "/redis.png",
+      imageAlt: "Redis from Scratch project preview",
+      techStack: ["Python", "TCP Sockets", "RESP", "Threading", "Client-Server Systems", "Git"],
+      github: "https://github.com/r4inr3aper/redis-from-scratch",
+      featured: false,
+      category: ["fullstack"],
+    },
+    {
       "id": 3,
       "name": "Inframe School Official Website",
       "description": "Built a custom CMS from scratch for efficient content management, ensuring easy updates for admins.",

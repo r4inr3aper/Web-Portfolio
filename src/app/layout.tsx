@@ -122,13 +122,17 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-screen flex-col items-center justify-between">
-        <main className="p-4 py-24 gap-6 w-full lg:w-[55%]">
-          <Header />
+        <main data-site-main className="p-4 py-24 gap-6 w-full lg:w-[55%]">
+          <div data-site-header>
+            <Header />
+          </div>
           <div className="flex flex-col gap-12 w-full h-full">
             {children}
           </div>
         </main>
-        <Footer />
+        <div data-site-footer className="w-full">
+          <Footer />
+        </div>
       </body>
     </html>
   );
