@@ -49,7 +49,7 @@ const WORLD_WIDTH = 1024;
 const WORLD_HEIGHT = 576;
 const MAP_COLS = 70;
 const TILE_SIZE = 48;
-const BASE_SPEED = 4;
+const BASE_SPEED = 4.6;
 const JOYSTICK_DEADZONE = 0.2;
 const INTERACTION_COOLDOWN_MS = 900;
 
@@ -865,5 +865,6 @@ export function createPelletTownEngine(canvas: HTMLCanvasElement, options: Engin
     destroy,
     setJoystick,
     requestInteract,
+    resize,
   };
 }

@@ -26,6 +26,7 @@ interface CommandLine {
 export function PelletTownGame() {
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<ReturnType<typeof createPelletTownEngine> | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [loading, setLoading] = useState(true);
@@ -150,6 +151,33 @@ export function PelletTownGame() {
   useEffect(() => {
     engineRef.current?.setJoystick(joystickState);
   }, [joystickState]);
+
+  useEffect(() => {
+    const node = viewportRef.current;
+    if (!node || !engineRef.current) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      engineRef.current?.resize();
+    });
+
+    observer.observe(node);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [loading]);
+
+  useEffect(() => {
+    const rafId = window.requestAnimationFrame(() => {
+      engineRef.current?.resize();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+    };
+  }, [isMobileViewport, mobileFullscreen, isAndroidDevice, showMissionBrief]);
 
   useEffect(() => {
     if (terminalUnlocked) {
@@ -370,7 +398,15 @@ export function PelletTownGame() {
   };
 
   return (
-    <section className={isImmersiveMobileGameplay ? "fixed inset-0 z-[120] bg-black" : "w-full"}>
+    <section
+      className={`${isImmersiveMobileGameplay ? "fixed inset-0 z-[120] bg-black" : "w-full"} select-none`}
+      onContextMenu={(event) => {
+        if (isMobileViewport) {
+          event.preventDefault();
+        }
+      }}
+      style={{ WebkitTouchCallout: "none", WebkitUserSelect: "none", userSelect: "none" }}
+    >
       <div
         className={`relative overflow-hidden ${
           isImmersiveMobileGameplay
@@ -451,6 +487,7 @@ export function PelletTownGame() {
             )}
 
             <div
+              ref={viewportRef}
               className={`relative overflow-hidden ${
                 isImmersiveMobileGameplay
                   ? "mx-auto aspect-[16/9] w-[96vw] max-w-[640px] border border-zinc-700 bg-zinc-950"
@@ -473,7 +510,10 @@ export function PelletTownGame() {
             </div>
 
             {isAndroidGbaMode && (
-              <div className="relative z-10 mt-3 flex flex-1 flex-col px-4 pb-5">
+              <div
+                className="relative z-10 mt-3 flex flex-1 flex-col px-4 pb-5"
+                style={{ WebkitTouchCallout: "none", WebkitUserSelect: "none", userSelect: "none" }}
+              >
                 <div className="mb-4 flex items-center justify-between px-2">
                   <button className="h-9 min-w-24 rounded-md border border-zinc-500/80 bg-gradient-to-b from-zinc-700 to-zinc-800 text-sm font-semibold text-zinc-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
                     L
@@ -588,7 +628,10 @@ export function PelletTownGame() {
             )}
 
             {!isAndroidGbaMode && mobileFullscreen && isMobileViewport && (
-              <div className="relative z-10 mt-5 flex flex-1 items-end justify-between px-4 pb-5">
+              <div
+                className="relative z-10 mt-5 flex flex-1 items-end justify-between px-4 pb-5"
+                style={{ WebkitTouchCallout: "none", WebkitUserSelect: "none", userSelect: "none" }}
+              >
                 <VirtualJoystick
                   containerClassName="relative"
                   onMove={(state) => {
@@ -635,8 +678,8 @@ export function PelletTownGame() {
         )}
       </div>
 
-      {showMissionBrief && !loading && !error && !isImmersiveMobileGameplay && (
-        <div className="fixed inset-0 z-[220] grid place-items-center bg-zinc-950/85 p-4 backdrop-blur-sm">
+      {showMissionBrief && !loading && !error && (
+        <div className="fixed inset-0 z-[230] grid place-items-center bg-zinc-950/85 p-4 backdrop-blur-sm">
           <div className="w-full max-w-2xl rounded-2xl border border-amber-300/25 bg-zinc-900/95 p-5 sm:p-6">
             <p className="text-xs uppercase tracking-[0.22em] text-amber-200">Mission Brief</p>
             <h3 className="mb-0 mt-2 text-2xl sm:text-3xl">Quick Instructions</h3>
